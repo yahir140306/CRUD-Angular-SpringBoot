@@ -11,27 +11,45 @@
     <h2>{{ editId ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
 
     <div>
-      <label>Nombre</label>
-      <input type="text" [(ngModel)]="formulario.name" )] placeholder="Eje: Mochila" required />
+      <label for="nombre">Nombre</label>
+      <input
+        id="nombre"
+        type="text"
+        [(ngModel)]="formulario.name"
+        placeholder="Eje: Mochila"
+        required
+      />
     </div>
 
     <div>
-      <label>Precio</label>
-      <input type="number" [(ngModel)]="formulario.price" )] placeholder="Eje: $500" required />
+      <label for="precio">Precio</label>
+      <input
+        id="precio"
+        type="number"
+        [(ngModel)]="formulario.price"
+        placeholder="Eje: $500"
+        required
+      />
     </div>
 
     <div>
-      <label>Cantidad</label>
-      <input type="number" [(ngModel)]="formulario.quantity" )] placeholder="Eje: 10" required />
+      <label for="cantidad">Cantidad</label>
+      <input
+        id="cantidad"
+        type="number"
+        [(ngModel)]="formulario.quantity"
+        placeholder="Eje: 10"
+        required
+      />
     </div>
 
-    <button (click)="save()">
-      {{ editId ? ' Actualizar ' : ' Crear Pruducto ' }}
+    <button (click)="save()" type="button">
+      {{ editId ? ' Actualizar ' : ' Crear Producto ' }}
     </button>
 
-    <button (click)="cleanForm()">Cancelar</button>
+    <button (click)="cleanForm()" type="button">Cancelar</button>
 
-    <!-- Tabla de pruductos -->
+    <!-- Tabla de productos -->
     <h2>Productos Registrados</h2>
 
     @if (products.length === 0) {
