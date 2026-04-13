@@ -11,8 +11,9 @@ public class Product {
     private Long id;
 
     private String name;
-    private Double precio;
-    private Integer cantidad;
+
+    private Double price;
+    private Integer quantity;
 
     public Long getId() {
         return id;
@@ -30,19 +31,19 @@ public class Product {
         this.name = name;
     }
 
-    public Double getPrecio() {
-        return precio;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setPrecio(Double precio) {
-        this.precio = precio;
+    public void setPrice(Double precio) {
+        this.price = precio;
     }
 
-    public Integer getCantidad() {
-        return cantidad;
+    public Integer getQuantity() {
+        return quantity;
     }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }
