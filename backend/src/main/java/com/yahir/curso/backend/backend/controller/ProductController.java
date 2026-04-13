@@ -41,8 +41,8 @@ public class ProductController {
         return service.findById(id)
                 .map(productExist -> {
                     productExist.setName(newData.getName());
-                    productExist.setPrecio(newData.getPrecio());
-                    productExist.setCantidad(newData.getCantidad());
+                    productExist.setPrice(newData.getPrice());
+                    productExist.setQuantity(newData.getQuantity());
 
                     Product update = null;
                     try {
