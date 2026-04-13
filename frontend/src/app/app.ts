@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Product } from './models/model';
 import { ProductService } from './services/product';
 import { FormsModule } from '@angular/forms';
@@ -20,8 +20,9 @@ export class App implements OnInit {
 
   editId: number | null = null;
 
-  mensaje: string = '';
+  mensaje = '';
 
+  // eslint-disable-next-line @angular-eslint/prefer-inject
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
@@ -33,9 +34,9 @@ export class App implements OnInit {
       next: (data) => {
         this.products = data;
       },
-      error: (err) => {
+      error: (error) => {
         this.mensaje = 'Error al cargar productos. Posible error en el backend';
-        console.error(err);
+        console.error(error);
       },
     });
   }
@@ -43,21 +44,21 @@ export class App implements OnInit {
   save(): void {
     if (this.editId !== null) {
       this.productService.update(this.editId, this.formulario).subscribe({
-        next: (data) => {
+        next: () => {
           this.mensaje = 'Producto actualizado correctamente';
           this.loadProducts();
           this.cleanForm();
         },
-        error: (err) => (this.mensaje = 'Error al actualizar'),
+        error: () => (this.mensaje = 'Error al actualizar'),
       });
     } else {
       this.productService.create(this.formulario).subscribe({
-        next: (data) => {
+        next: () => {
           this.mensaje = 'Producto creado correctamente';
           this.loadProducts();
           this.cleanForm();
         },
-        error: (err) => (this.mensaje = 'Error al crear producto'),
+        error: () => (this.mensaje = 'Error al crear producto'),
       });
     }
   }
@@ -79,11 +80,11 @@ export class App implements OnInit {
     }
 
     this.productService.delete(id).subscribe({
-      next: (data) => {
+      next: () => {
         this.mensaje = 'Producto eliminado';
         this.loadProducts();
       },
-      error: (err) => (this.mensaje = 'Error al eliminar'),
+      error: () => (this.mensaje = 'Error al eliminar'),
     });
   }
 
