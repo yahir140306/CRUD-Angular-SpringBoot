@@ -1,9 +1,8 @@
 # docker-compose.yml (en la raíz del proyecto)
-version: "3.8"
 
 services:
   db:
-    image: postgres:18.3.0
+    image: postgres:16
     container_name: postgres_db
     environment:
       POSTGRES_DB: db_crud

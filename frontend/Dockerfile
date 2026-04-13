@@ -1,5 +1,5 @@
 # ── ETAPA 1: Compilar Angular ──────────────────────────────────────────
-FROM node:18-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Construimos Angular en modo producción
-# Genera archivos estáticos en /app/dist/frontend/browser/
+# Genera archivos estáticos en /app/dist/fronted/
 RUN npm run build
 
 # ── ETAPA 2: Servir con Nginx ──────────────────────────────────────────
@@ -21,7 +21,7 @@ RUN npm run build
 FROM nginx:alpine
 
 # Copiamos los archivos compilados al directorio que Nginx sirve
-COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
+COPY --from=build /app/dist/fronted/browser /usr/share/nginx/html
 
 # Puerto 80 es el estándar de HTTP
 EXPOSE 80

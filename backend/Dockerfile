@@ -1,6 +1,6 @@
 # ── ETAPA 1: Compilar el proyecto ──────────────────────────────────────
-# Usamos una imagen que tiene Java 17 + Maven para compilar
-FROM eclipse-temurin:17-jdk-alpine AS build
+# Usamos una imagen que tiene Java 21 + Maven para compilar
+FROM eclipse-temurin:21-jdk-alpine AS build
 
 # Directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -22,7 +22,7 @@ RUN ./mvnw package -DskipTests
 
 # ── ETAPA 2: Imagen final (más liviana, sin Maven) ─────────────────────
 # Solo necesitamos Java para EJECUTAR el .jar, no para compilar
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
