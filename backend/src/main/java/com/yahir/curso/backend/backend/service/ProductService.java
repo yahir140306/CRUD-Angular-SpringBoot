@@ -23,7 +23,7 @@ public class ProductService {
     }
 
     public Product save(Product product) throws Exception {
-        if (product.getPrecio() < 0) throw new Exception("Precio invalido");
+        if (product.getPrice() < 0) throw new Exception("Precio invalido");
         return repository.save(product);
     }
 
