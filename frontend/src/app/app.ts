@@ -33,6 +33,7 @@ export class App implements OnInit {
     this.productService.view().subscribe({
       next: (data) => {
         this.products = data;
+        console.log('Productos cargados:', this.products);
       },
       error: (error) => {
         this.mensaje = 'Error al cargar productos. Posible error en el backend';
@@ -48,6 +49,7 @@ export class App implements OnInit {
           this.mensaje = 'Producto actualizado correctamente';
           this.loadProducts();
           this.cleanForm();
+          console.log('Producto actualizado:', this.formulario);
         },
         error: () => (this.mensaje = 'Error al actualizar'),
       });
@@ -57,6 +59,7 @@ export class App implements OnInit {
           this.mensaje = 'Producto creado correctamente';
           this.loadProducts();
           this.cleanForm();
+          console.log('Producto creado:', this.formulario);
         },
         error: () => (this.mensaje = 'Error al crear producto'),
       });
@@ -83,6 +86,7 @@ export class App implements OnInit {
       next: () => {
         this.mensaje = 'Producto eliminado';
         this.loadProducts();
+        console.log('Producto eliminado:', id);
       },
       error: () => (this.mensaje = 'Error al eliminar'),
     });
