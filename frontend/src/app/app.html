@@ -13,7 +13,8 @@
     <div>
       <label for="nombre">Nombre</label>
       <input
-        id="nombre"
+        id="name"
+        name="name"
         type="text"
         [(ngModel)]="formulario.name"
         placeholder="Eje: Mochila"
@@ -24,7 +25,8 @@
     <div>
       <label for="precio">Precio</label>
       <input
-        id="precio"
+        id="price"
+        name="price"
         type="number"
         [(ngModel)]="formulario.price"
         placeholder="Eje: $500"
@@ -35,7 +37,8 @@
     <div>
       <label for="cantidad">Cantidad</label>
       <input
-        id="cantidad"
+        id="quantity"
+        name="quantity"
         type="number"
         [(ngModel)]="formulario.quantity"
         placeholder="Eje: 10"
@@ -43,11 +46,11 @@
       />
     </div>
 
-    <button (click)="save()" type="button">
+    <button type="button" (click)="save()">
       {{ editId ? ' Actualizar ' : ' Crear Producto ' }}
     </button>
 
-    <button (click)="cleanForm()" type="button">Cancelar</button>
+    <button type="button" (click)="cleanForm()">Cancelar</button>
 
     <!-- Tabla de productos -->
     <h2>Productos Registrados</h2>
@@ -74,9 +77,10 @@
               <td>{{ p.name }}</td>
               <td>{{ p.price }}</td>
               <td>{{ p.quantity }} unidades</td>
-
-              <button (click)="edit(p)">Editar</button>
-              <button (click)="delete(p.id!)">Eliminar</button>
+              <td>
+                <button type="button" (click)="edit(p)">Editar</button>
+                <button type="button" (click)="delete(p.id!)">Eliminar</button>
+              </td>
             </tr>
           }
         </tbody>
