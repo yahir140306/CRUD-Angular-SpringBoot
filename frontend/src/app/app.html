@@ -46,11 +46,11 @@
       />
     </div>
 
-    <button type="button" (click)="save()">
-      {{ editId ? ' Actualizar ' : ' Crear Producto ' }}
+    <button type="button" (click)="save()" [disabled]="isLoading">
+      {{ isLoading ? 'Guardando...' : editId ? 'Actualizar' : 'Crear Producto' }}
     </button>
 
-    <button type="button" (click)="cleanForm()">Cancelar</button>
+    <button type="button" (click)="cleanForm()" [disabled]="isLoading">Cancelar</button>
   </form>
 
   <!-- Tabla de productos -->
