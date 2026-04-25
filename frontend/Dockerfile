@@ -1,5 +1,4 @@
-# ── ETAPA 1: Compilar Angular ──────────────────────────────────────────
-FROM node:20-alpine AS build
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -12,18 +11,7 @@ RUN npm install
 # Copiamos el resto del código
 COPY . .
 
-# Construimos Angular en modo producción
-# Genera archivos estáticos en /app/dist/fronted/
-RUN npm run build
+# Angular dev server
+EXPOSE 4200
 
-# ── ETAPA 2: Servir con Nginx ──────────────────────────────────────────
-# Nginx es un servidor web ultra-rápido y liviano
-FROM nginx:alpine
-
-# Copiamos los archivos compilados al directorio que Nginx sirve
-COPY --from=build /app/dist/fronted/browser /usr/share/nginx/html
-
-# Puerto 80 es el estándar de HTTP
-EXPOSE 80
-
-# Nginx arranca automáticamente con la imagen base
+CMD ["npm", "start", "--", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000"]
