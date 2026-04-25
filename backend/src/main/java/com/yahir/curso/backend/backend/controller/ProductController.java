@@ -4,9 +4,11 @@ import com.yahir.curso.backend.backend.model.Product;
 import com.yahir.curso.backend.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -34,7 +36,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(
+    public ResponseEntity<?> update(
             @PathVariable Long id,
             @RequestBody Product newData
     ) {
@@ -44,13 +46,15 @@ public class ProductController {
                     productExist.setPrice(newData.getPrice());
                     productExist.setQuantity(newData.getQuantity());
 
-                    Product update = null;
+                    //Product update = null;
                     try {
-                        update = service.save(productExist);
+                        //update = service.save(productExist);
+                        Product update = service.save(productExist);
+                        return ResponseEntity.ok(update);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
                     }
-                    return ResponseEntity.ok(update);
+                    //return ResponseEntity.ok(update);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
