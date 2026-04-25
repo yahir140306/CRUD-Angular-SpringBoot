@@ -44,9 +44,7 @@ export class App implements OnInit {
   }
 
   save(): void {
-    if (this.isLoading) {
-      return;
-    }
+    if (this.isLoading) return;
 
     this.isLoading = true;
 
@@ -55,17 +53,15 @@ export class App implements OnInit {
         .update(this.editId, this.formulario)
         .pipe(finalize(() => (this.isLoading = false)))
         .subscribe({
-          next: (productoActualizado) => {
-            this.products = this.products.map((p) =>
-              p.id === this.editId ? productoActualizado : p,
-            );
+          next: (productoUpdate) => {
+            this.products = this.products.map((p) => (p.id === this.editId ? productoUpdate : p));
             this.mensaje = 'Producto actualizado correctamente';
+            console.log('Producto actualizado:', productoUpdate);
             this.cleanForm();
-            console.log('Producto actualizado:', productoActualizado);
           },
-          error: () => {
-            this.mensaje = 'Error al actualizar';
-            console.error('Error al actualizar producto');
+          error: (err) => {
+            this.mensaje = err.error?.message || 'Error al actualizar el producto';
+            console.error('Error al actualizar producto', err);
           },
         });
     } else {
@@ -78,9 +74,9 @@ export class App implements OnInit {
             this.mensaje = 'Producto creado correctamente';
             this.cleanForm();
           },
-          error: () => {
-            this.mensaje = 'Error al crear producto';
-            console.error('Error al crear producto');
+          error: (err) => {
+            this.mensaje = err.error?.menssage || 'Error al crear el producto';
+            console.error('Error al crear producto', err);
           },
         });
     }
