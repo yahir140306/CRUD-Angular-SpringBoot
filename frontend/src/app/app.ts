@@ -1,125 +1,141 @@
-import { Component, OnInit } from '@angular/core';
-import { Product } from './models/model';
+import { Component, computed, OnInit, signal, inject } from '@angular/core';
 import { ProductService } from './services/product';
 import { FormsModule } from '@angular/forms';
-import { finalize } from 'rxjs';
+import { Product } from './models/model';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule],
+  imports: [FormsModule, HttpClientModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App implements OnInit {
-  products: Product[] = [];
+  private service = inject(ProductService);
 
-  formulario: Product = {
+  products = signal<Product[]>([]);
+  loading = signal(false);
+  saving = signal(false);
+  editId = signal<number | null>(null);
+  menssage = signal<{ texto: string; tipo: 'ok' | 'error' } | null>(null);
+
+  formulario = signal<Omit<Product, 'id'>>({
     name: '',
     price: 0,
     quantity: 0,
-  };
+  });
 
-  editId: number | null = null;
-  mensaje = '';
-  isLoading = false;
+  modEdit = computed(() => this.editId() !== null);
 
-  // eslint-disable-next-line @angular-eslint/prefer-inject
-  constructor(private productService: ProductService) {}
+  titleBtnSave = computed(() =>
+    this.saving()
+      ? this.modEdit()
+        ? 'Actualizando...'
+        : 'Creando'
+      : this.modEdit()
+        ? 'Actualizar'
+        : 'Crear Producto',
+  );
+
+  totalProducts = computed(() => this.products().length);
+  totalStock = computed(() => this.products().reduce((acc, p) => acc + p.quantity, 0));
+  valueInventario = computed(() =>
+    this.products().reduce((acc, p) => acc + p.price * p.quantity, 0),
+  );
 
   ngOnInit(): void {
-    this.loadProducts();
+    this.load();
   }
 
-  loadProducts(): void {
-    this.productService.view().subscribe({
+  load(): void {
+    this.loading.set(true);
+    this.service.listar().subscribe({
       next: (data) => {
-        this.products = data;
-        console.log('Productos cargados:', this.products);
+        this.products.set(data);
+        this.loading.set(false);
+        console.log(data);
       },
-      error: (error) => {
-        this.mensaje = 'Error al cargar productos. Posible error en el backend';
-        console.error(error);
+      error: () => {
+        this.mostrarMensaje('No se pudo conectar al backend', 'error');
+        this.loading.set(false);
       },
     });
   }
 
   save(): void {
-    if (this.isLoading) return;
+    const form = this.formulario();
 
-    this.isLoading = true;
-
-    if (this.editId !== null) {
-      this.productService
-        .update(this.editId, this.formulario)
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe({
-          next: (productoUpdate) => {
-            this.products = this.products.map((p) => (p.id === this.editId ? productoUpdate : p));
-            this.mensaje = 'Producto actualizado correctamente';
-            console.log('Producto actualizado:', productoUpdate);
-            this.cleanForm();
-          },
-          error: (err) => {
-            this.mensaje = err.error?.message || 'Error al actualizar el producto';
-            console.error('Error al actualizar producto', err);
-          },
-        });
-    } else {
-      this.productService
-        .create(this.formulario)
-        .pipe(finalize(() => (this.isLoading = false)))
-        .subscribe({
-          next: (productCreate) => {
-            this.products = [...this.products, productCreate];
-            this.mensaje = 'Producto creado correctamente';
-            this.cleanForm();
-          },
-          error: (err) => {
-            this.mensaje = err.error?.menssage || 'Error al crear el producto';
-            console.error('Error al crear producto', err);
-          },
-        });
+    if (!form.name.trim() || form.price <= 0 || form.quantity < 0) {
+      this.mostrarMensaje('Completa todos los campos correctamente', 'error');
+      console.log(form);
+      return;
     }
+
+    this.saving.set(true);
+
+    const id = this.editId();
+
+    const operacion$ = id ? this.service.actualizar(id, form) : this.service.crear(form);
+
+    operacion$.subscribe({
+      next: (productResponse) => {
+        if (id) {
+          const id = this.editId();
+          this.products.update((lista) => lista.map((p) => (p.id === id ? productResponse : p)));
+          this.mostrarMensaje('Producto actualizado', 'ok');
+        } else {
+          this.products.update((lista) => [...lista, productResponse]);
+          this.mostrarMensaje('Producto creado', 'ok');
+        }
+        this.saving.set(false);
+        this.limpiar();
+      },
+      error: () => {
+        this.mostrarMensaje('Error al guardar', 'error');
+        this.saving.set(false);
+      },
+    });
   }
 
-  edit(product: Product): void {
-    this.editId = product.id ?? null;
-    this.formulario = {
-      name: product.name,
-      price: product.price,
-      quantity: product.quantity,
-    };
-
-    this.mensaje = '';
+  edit(p: Product): void {
+    this.editId.set(p.id!);
+    this.formulario.set({ name: p.name, price: p.price, quantity: p.quantity });
+    this.limpiarMensaje();
+    document.getElementById('formulario')?.scrollIntoView({ behavior: 'smooth' });
+    console.log(p)
   }
 
-  delete(id: number): void {
-    if (this.isLoading) return;
-    if (!confirm('Seguro de eliminar?')) return;
+  delete(p: Product): void {
+    if (!confirm(`Eliminar "${p.name}"`)) return;
 
-    this.isLoading = true;
-    this.productService
-      .delete(id)
-      .pipe(finalize(() => (this.isLoading = false)))
-      .subscribe({
-        next: () => {
-          this.products = this.products.filter((p) => p.id !== id);
-          this.mensaje = 'Producto eliminado';
-          if (this.editId === id) this.cleanForm();
-        },
-        error: () => {
-          this.mensaje = 'Error al eliminar';
-        },
-      });
+    const listaAnterior = this.products();
+    this.products.update((lista) => lista.filter((x) => x.id !== p.id));
+
+    this.service.eliminar(p.id!).subscribe({
+      next: () => this.mostrarMensaje('Producto eliminado', 'ok'),
+      error: () => {
+        this.products.set(listaAnterior);
+        this.mostrarMensaje('Error al eliminar', 'error');
+      },
+    });
   }
 
-  cleanForm(): void {
-    this.formulario = {
-      name: '',
-      price: 0,
-      quantity: 0,
-    };
-    this.editId = null;
-    // setTimeout(() => (this.mensaje = ''), 3000);
+  limpiar(): void {
+    this.formulario.set({ name: '', price: 0, quantity: 0 });
+    this.editId.set(null);
+  }
+
+  // Actualiza un campo individual del formulario manteniendo los demás
+  actualizarCampo(campo: keyof Omit<Product, 'id'>, valor: string | number): void {
+    this.formulario.update((f) => ({ ...f, [campo]: valor }));
+  }
+
+  private mostrarMensaje(texto: string, tipo: 'ok' | 'error'): void {
+    this.menssage.set({ texto, tipo });
+    setTimeout(() => this.menssage.set(null), 3500);
+  }
+
+  private limpiarMensaje(): void {
+    this.menssage.set(null);
   }
 }
