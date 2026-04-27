@@ -1,22 +1,23 @@
 <div>
   <h1>Gestion de Productos</h1>
 
-  @if (mensaje) {
+  @if (menssage(); as msg) {
     <div id="mensaje">
-      {{ mensaje }}
+      {{ msg.texto }}
     </div>
   }
 
   <form>
-    <h2>{{ editId ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+    <h2>{{ modEdit() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
 
     <div>
-      <label for="nombre">Nombre:</label>
+      <label for="name">Nombre:</label>
       <input
         id="name"
         name="name"
         type="text"
-        [(ngModel)]="formulario.name"
+        [(ngModel)]="formulario().name"
+        (ngModelChange)="actualizarCampo('name', $event)"
         placeholder="Eje: Mochila"
         required
       />
@@ -28,7 +29,8 @@
         id="price"
         name="price"
         type="number"
-        [(ngModel)]="formulario.price"
+        [(ngModel)]="formulario().price"
+        (ngModelChange)="actualizarCampo('price', +$event)"
         placeholder="Eje: $500"
         required
       />
@@ -40,27 +42,36 @@
         id="quantity"
         name="quantity"
         type="number"
-        [(ngModel)]="formulario.quantity"
+        [(ngModel)]="formulario().quantity"
+        (ngModelChange)="actualizarCampo('quantity', +$event)"
         placeholder="Eje: 10"
         required
       />
     </div>
 
-    <button type="button" (click)="save()" [disabled]="isLoading">
-      {{ isLoading ? 'Guardando...' : editId ? 'Actualizar' : 'Crear Producto' }}
+    <button type="button" (click)="save()">
+      {{ titleBtnSave() }}
     </button>
 
-    <button type="button" (click)="cleanForm()" [disabled]="isLoading">Cancelar</button>
+    <button type="button" (click)="limpiar()">Cancelar</button>
+
+    @if (modEdit()) {
+      <button type="button" (click)="limpiar()">Cancelar edicion</button>
+    }
   </form>
 
   <!-- Tabla de productos -->
   <h2>Productos Registrados</h2>
+  <!--@if (products.length === 0) {
 
-  @if (products.length === 0) {
     <p>No hay productos aun.</p>
+  }-->
+
+  @if (!loading() && products().length === 0) {
+    <p>No ay productos</p>
   }
 
-  @if (products.length > 0) {
+  @if (products().length > 0) {
     <div class="table-wrapper">
       <table>
         <thead>
@@ -73,7 +84,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (p of products; track p.id; let i = $index) {
+          @for (p of products(); track p.id) {
             <tr>
               <td data-label="ID">{{ p.id }}</td>
               <td data-label="Nombre">{{ p.name }}</td>
@@ -82,7 +93,7 @@
               <td data-label="Acciones">
                 <div class="action-buttons">
                   <button type="button" (click)="edit(p)">Editar</button>
-                  <button type="button" (click)="delete(p.id!)">Eliminar</button>
+                  <button type="button" (click)="delete(p)">Eliminar</button>
                 </div>
               </td>
             </tr>
