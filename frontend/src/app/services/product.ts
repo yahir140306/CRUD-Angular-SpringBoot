@@ -1,35 +1,28 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Product } from '../models/model';
-import { environment } from '../enviroment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private apiUrl = environment.apiUrl + '/api/products';
+  private http = inject(HttpClient);
+  private apiUrl = 'http://localhost:8080/api/products';
 
-  // eslint-disable-next-line @angular-eslint/prefer-inject
-  constructor(private http: HttpClient) {}
-
-  view(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.apiUrl}`);
+  listar(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.apiUrl)
   }
 
-  findById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.apiUrl}/${id}`);
+  crear(product: Omit<Product, 'id'>): Observable<Product> {
+    return this.http.post<Product>(this.apiUrl, product)
   }
 
-  create(product: Product): Observable<Product> {
-    return this.http.post<Product>(this.apiUrl, product);
+  actualizar(id: number, product: Omit<Product, 'id'>): Observable<Product> {
+    return this.http.put<Product>(`${this.apiUrl}/${id}`, product)
   }
 
-  update(id: number, product: Product): Observable<Product> {
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, product);
-  }
-
-  delete(id: number): Observable<Product> {
-    return this.http.delete<Product>(`${this.apiUrl}/${id}`);
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`)
   }
 }
