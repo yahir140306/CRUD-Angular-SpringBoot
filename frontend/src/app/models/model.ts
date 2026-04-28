@@ -5,4 +5,3 @@ export interface Product {
   quantity: number;
 }
 
-export type ProductForm = Omit< Product, 'id'>
