@@ -1,8 +1,8 @@
 // src/app/app.module.ts
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http'; // ← para hacer peticiones HTTP
-import { FormsModule } from '@angular/forms'; // ← para [(ngModel)] en el formulario
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 import { App } from './app';
 
@@ -12,10 +12,9 @@ import { App } from './app';
   ],
   imports: [
     BrowserModule,
-    HttpClientModule, // ← SIN ESTO no funcionan las peticiones al backend
+    HttpClientModule,
     FormsModule,
-    App,
-    // ← SIN ESTO no funciona el formulario
+    App
   ],
   providers: [],
   bootstrap: [],
